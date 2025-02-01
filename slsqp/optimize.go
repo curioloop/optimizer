@@ -21,12 +21,7 @@ type Bound struct {
 //   - 𝒄(𝐱) : ℝⁿ → ℝᵐ
 //   - 𝒇′(𝐱) : ℝⁿ → ℝⁿ (partials of the objective function)
 //   - 𝒄′(𝐱) : ℝⁿ → ℝᵐˣⁿ (constraint normals)
-type Evaluation struct {
-	// Function return scalar value for given 𝐱
-	Function func(x []float64) float64
-	// Derivative provide the n-vector partial derivative for given 𝐱
-	Derivative func(x []float64, d []float64)
-}
+type Evaluation func(x []float64, g []float64) (f float64)
 
 // Termination specifies the stopping criteria for the optimization algorithm.
 type Termination struct {
@@ -108,8 +103,8 @@ func (p *Problem) New() (optimizer *Optimizer, err error) {
 		err = errors.New("problem dimension must greater than 0")
 	case meq > n:
 		err = errors.New("equality constrains number must not greater than n")
-	case obj.Function == nil || obj.Derivative == nil:
-		err = errors.New("both func and der of objective is required")
+	case obj == nil:
+		err = errors.New("objective function is required")
 	case stop.MaxIterations <= 0:
 		err = errors.New("max iteration must greater than 1")
 	case stop.NNLSIterations < 0:
@@ -129,13 +124,13 @@ func (p *Problem) New() (optimizer *Optimizer, err error) {
 	}
 
 	for k, c := range eq {
-		if c.Function == nil || c.Derivative == nil {
+		if c == nil {
 			err = errors.New(fmt.Sprintf("equality constraint error at %d", k))
 			break
 		}
 	}
 	for k, c := range neq {
-		if c.Function == nil || c.Derivative == nil {
+		if c == nil {
 			err = errors.New(fmt.Sprintf("inequality constraint error at %d", k))
 			break
 		}
@@ -206,7 +201,7 @@ type Summary struct {
 	NumIter int     // Number of iterations performed.
 }
 
-// Init allocate the workspace for L-BFGS-B optimizer.
+// Init allocate the workspace for SLSQP optimizer.
 // To avoid race conditions, separate workspaces need to be created for each goroutine.
 // But multiple workspaces could share one optimizer.
 func (o *Optimizer) Init() *Workspace {

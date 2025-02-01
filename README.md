@@ -108,33 +108,45 @@ func main() {
 	// Define the objective function and its gradient.
 
 	// Objective : x[0]^2 + x[1]^2
-	obj := slsqp.Evaluation{
-		Function: func(x []float64) float64 {
-			return x[0]*x[0] + x[1]*x[1]
-		},
-		Derivative: func(x []float64, d []float64) {
-			d[0], d[1] = 2*x[0], 2*x[1]
-		},
+	obj := func(x []float64, g []float64) (f float64) {
+		if g == nil {
+			f = x[0]*x[0] + x[1]*x[1]
+        } else {
+			g[0], g[1] = 2*x[0], 2*x[1]
+		}
+		return 
 	}
 
 	// Define the constraint functions and its normals.
 
-	// Equality constraint: x[1] + x[2] = 1
-	cons1 := slsqp.Evaluation{
-		Function:   func(x []float64) float64 { return x[0] + x[1] - 1 },
-		Derivative: func(x []float64, d []float64) { d[0], d[1] = 1, 1 },
+	// Equality constraint: x[0] + x[1] = 1
+	cons1 := func(x []float64, g []float64) (f float64) {
+		if g == nil {
+			f = x[0] + x[1] - 1
+		} else {
+			g[0], g[1] = 1, 1
+		}
+		return 
 	}
 
-	// Inequality constraint: x[1] >= 1
-	cons2 := slsqp.Evaluation{
-		Function:   func(x []float64) float64 { return x[0] - 1 },
-		Derivative: func(x []float64, d []float64) { d[0], d[1] = 1, 0 },
+	// Inequality constraint: x[0] >= 1
+	cons2 := func(x []float64, g []float64) (f float64) {
+		if g == nil {
+			f = x[0] - 1
+		} else {
+			g[0], g[1] = 1, 0
+		}
+		return
 	}
 
-	// Inequality constraint: x[2] >= 0
-	cons3 := slsqp.Evaluation{
-		Function:   func(x []float64) float64 { return x[1] },
-		Derivative: func(x []float64, d []float64) { d[0], d[1] = 0, 1 },
+	// Inequality constraint: x[1] >= 0
+	cons3 := func(x []float64, g []float64) (f float64) {
+		if g == nil {
+			f = x[1]
+		} else {
+			g[0], g[1] = 0, 1
+		}
+		return
 	}
 
 	// Define termination conditions for the optimizer.

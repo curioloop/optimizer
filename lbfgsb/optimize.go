@@ -142,7 +142,7 @@ func (p *Problem) New(logger *Logger) (optimizer *Optimizer, err error) {
 	case m <= 0:
 		err = errors.New("correction number must greater than 0")
 	case eval == nil:
-		err = errors.New("evaluation target is required")
+		err = errors.New("objective function is required")
 	case stop.MaxIterations <= 0:
 		err = errors.New("max iteration must greater than 1")
 	case !math.IsNaN(stop.EpsAccuracyFactor) && stop.EpsAccuracyFactor < one:

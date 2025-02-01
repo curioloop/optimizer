@@ -81,7 +81,7 @@ import (
 //
 // The α can be obtained by projecting the infeasible 𝐬 to the boundaries defined by ℙ.
 //
-// Once new location 𝐱ᵏ⁺¹ = 𝐱ᵏ + α𝐝 + 𝛂𝐝 is determined, update ℤ and ℙ and solve new EQP again.
+// Once new location 𝐱ᵏ⁺¹ = 𝐱ᵏ + α𝐝 is determined, update ℤ and ℙ and solve new EQP again.
 //
 // In case of NNLS, the EQP is a unconstrained least-squares problem 𝚖𝚒𝚗 ½‖ 𝐀ᴾ𝐱 - 𝐛 ‖₂.
 // The matrix 𝐀ᴾ is a matrix containing only the variables currently in ℙ.

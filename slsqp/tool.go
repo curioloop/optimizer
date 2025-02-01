@@ -21,6 +21,9 @@ var invPhi2 = one / (math.Phi * math.Phi) //  golden section ratio
 // On input, v contains the pivot vector, ive is the storage increment between elements.
 // On output, v contains quantities defining the vector u of the Householder transformation.
 // The u[lₚ] element will be return separately.
+//
+// C.L. Lawson, R.J. Hanson, 'Solving least squares problems' Prentice Hall, 1974. (revised 1995 edition)
+// Chapters 10.
 func h1(p, l, m int, v []float64, ive int) (up float64) {
 
 	// Check 0 ≤ lₚ < l₁ ≤ m-1
@@ -143,6 +146,9 @@ func h2(p, l, m int,
 //
 // use rotation matrix to reduce the system to upper triangular form
 // and reduce the right side so that only first n+1 components are non-zero
+//
+// C.L. Lawson, R.J. Hanson, 'Solving least squares problems' Prentice Hall, 1974. (revised 1995 edition)
+// Chapters 3.
 func g1(a, b float64) (c, s, sig float64) {
 	// Temporary variables
 	var xr, yr float64
@@ -181,6 +187,9 @@ func g2(c, s float64, x, y float64) (xr, yr float64) {
 //   - 𝐃 = (𝐝₁···𝐝ₙ) is diagonal matrix with positive diagonal elements
 //   - 𝐀߬ is a positive definite matrix with rank-one modification
 //   - σ is scalar and 𝐳 is a vector
+//
+// Dieter Kraft, 'A Software Package for Sequential Quadratic Programming', 1988.
+// Chapters 2.32.
 func compositeT(n uint, a, z []float64, sigma float64, w []float64) {
 
 	// if σ = 0 then terminate

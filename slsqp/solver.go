@@ -151,24 +151,24 @@ func (ss *sqpSolver) evalLoc(mode sqpMode) sqpMode {
 		}()
 		switch mode {
 		case evalFunc:
-			loc.f = o.Object.Function(loc.x)
+			loc.f = o.Object(loc.x, nil)
 			for j, cons := range o.EqCons {
-				loc.c[j] = cons.Function(loc.x)
+				loc.c[j] = cons(loc.x, nil)
 			}
 			for j, cons := range o.NeqCons {
-				loc.c[j+o.meq] = cons.Function(loc.x)
+				loc.c[j+o.meq] = cons(loc.x, nil)
 			}
 		case evalGrad:
 			tmp, mda := loc.g[:o.n], max(o.m, 1)
 			for i, cons := range o.EqCons {
-				cons.Derivative(loc.x, tmp)
+				cons(loc.x, tmp)
 				dcopy(o.n, tmp, 1, loc.a[i:], mda)
 			}
 			for i, cons := range o.NeqCons {
-				cons.Derivative(loc.x, tmp)
+				cons(loc.x, tmp)
 				dcopy(o.n, tmp, 1, loc.a[i+o.meq:], mda)
 			}
-			o.Object.Derivative(loc.x, loc.g[:o.n])
+			o.Object(loc.x, loc.g[:o.n])
 		default:
 			mode = BadArgument
 			return
