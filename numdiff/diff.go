@@ -51,6 +51,8 @@ type ApproxSpec struct {
 	AbsStep float64
 	// Don't check if x0 is out of bounds.
 	NotChkBnd bool
+	// Whether transpose the Jacobian matrix.
+	TransJac bool
 	approxCtx
 }
 
@@ -265,8 +267,8 @@ func (as *ApproxSpec) approxForward(x0, df []float64) {
 
 func (as *ApproxSpec) approxCentral(x0, df []float64) {
 
-	f0, h, o, n := as.f0, as.absStep, as.oneSide, as.N
-	f1, f2 := as.fx[:as.M], as.fx[as.M:]
+	f0, h, o, n, m := as.f0, as.absStep, as.oneSide, as.N, as.M
+	f1, f2 := as.fx[:m], as.fx[m:]
 	if len(h) != len(x0) || len(h) != len(o) || len(f0) != len(f1) || len(f0) != len(f2) {
 		panic("bound check error")
 	}
@@ -274,25 +276,39 @@ func (as *ApproxSpec) approxCentral(x0, df []float64) {
 	fun := as.Object
 	fun(x0, as.f0)
 	for i, s := range h {
-		t := x0[i]
+		x := x0[i]
 		d := 1.0 / (2 * s)
 		if o[i] {
-			x0[i] = t + s
+			x0[i] = x + s
 			fun(x0, f1)
-			x0[i] = t + 2*s
+			x0[i] = x + 2*s
 			fun(x0, f2)
-			for j := range f0 {
-				df[i+j*n] = (4*f1[j] - 3*f0[j] - f2[j]) * d
+			if !as.TransJac {
+				for j := range f0 {
+					df[i+j*n] = (4*f1[j] - 3*f0[j] - f2[j]) * d
+				}
+			} else {
+				t := df[i*m : (i+1)*m]
+				for j := range f0 {
+					t[j] = (4*f1[j] - 3*f0[j] - f2[j]) * d
+				}
 			}
 		} else {
-			x0[i] = t - s
+			x0[i] = x - s
 			fun(x0, f1)
-			x0[i] = t + s
+			x0[i] = x + s
 			fun(x0, f2)
-			for j := range f0 {
-				df[i+j*n] = (f2[j] - f1[j]) * d
+			if !as.TransJac {
+				for j := range f0 {
+					df[i+j*n] = (f2[j] - f1[j]) * d
+				}
+			} else {
+				t := df[i*m : (i+1)*m]
+				for j := range f0 {
+					t[j] = (f2[j] - f1[j]) * d
+				}
 			}
 		}
-		x0[i] = t
+		x0[i] = x
 	}
 }

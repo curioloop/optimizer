@@ -146,7 +146,7 @@ func (p *Problem) New(logger *Logger) (optimizer *Optimizer, err error) {
 	case stop.MaxIterations <= 0:
 		err = errors.New("max iteration must greater than 1")
 	case !math.IsNaN(stop.EpsAccuracyFactor) && stop.EpsAccuracyFactor < one:
-		err = errors.New("machine epsilon factor must not less than 0")
+		err = errors.New("machine epsilon factor must not less than 1")
 	case !math.IsNaN(stop.ProjGradTolerance) && stop.ProjGradTolerance < zero:
 		err = errors.New("gradient projection tolerance must not less than 0")
 	case len(bounds) != n:
